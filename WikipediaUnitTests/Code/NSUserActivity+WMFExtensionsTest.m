@@ -32,6 +32,55 @@
     XCTAssertEqual(activity.wmf_type, WMFUserActivityTypeExplore);
 }
 
+- (void)testPlaceURLWithCorrectLocation {
+    NSURL *url = [NSURL URLWithString:@"wikipedia://places/?latitude=34.0335387&longitude=-118.8366035"];
+    NSUserActivity *activity = [NSUserActivity wmf_activityForWikipediaScheme:url];
+    XCTAssertEqual(activity.wmf_type, WMFUserActivityTypePlaces);
+    
+    // Test the values in the userInfo dictionary
+    NSDictionary *userInfo = activity.userInfo;
+    XCTAssertNotNil(userInfo, @"userInfo should not be nil");
+    
+    NSNumber *latitudeValue = userInfo[@"latitude"];
+    XCTAssertNotNil(latitudeValue, @"latitude should not be nil");
+    XCTAssertEqual(latitudeValue.doubleValue, 34.0335387, @"latitude value should match");
+    
+    NSNumber *longitudeValue = userInfo[@"longitude"];
+    XCTAssertNotNil(longitudeValue, @"longitude should not be nil");
+    XCTAssertEqual(longitudeValue.doubleValue, -118.8366035, @"longitude value should match");
+}
+
+- (void)testPlaceURLWithZeroCoordinates {
+    NSURL *url = [NSURL URLWithString:@"wikipedia://places/?latitude=0.0&longitude=0.0"];
+    NSUserActivity *activity = [NSUserActivity wmf_activityForWikipediaScheme:url];
+    XCTAssertEqual(activity.wmf_type, WMFUserActivityTypePlaces);
+    
+    // Test the values in the userInfo dictionary
+    NSDictionary *userInfo = activity.userInfo;
+    XCTAssertNotNil(userInfo, @"userInfo should not be nil");
+    
+    NSNumber *latitudeValue = userInfo[@"latitude"];
+    XCTAssertNotNil(latitudeValue, @"latitude should not be nil");
+    XCTAssertEqual(latitudeValue.doubleValue, 0.0, @"latitude value should match");
+    
+    NSNumber *longitudeValue = userInfo[@"longitude"];
+    XCTAssertNotNil(longitudeValue, @"longitude should not be nil");
+    XCTAssertEqual(longitudeValue.doubleValue, 0.0, @"longitude value should match");
+}
+- (void)testPlaceURLWithoutLocation {
+    NSURL *url = [NSURL URLWithString:@"wikipedia://places"];
+    NSUserActivity *activity = [NSUserActivity wmf_activityForWikipediaScheme:url];
+    XCTAssertEqual(activity.wmf_type, WMFUserActivityTypePlaces);
+    
+    // Test the values in the userInfo dictionary
+    NSDictionary *userInfo = activity.userInfo;
+    
+    NSNumber *latitudeValue = userInfo[@"latitude"];
+    XCTAssertNil(latitudeValue, @"latitude should be nil");
+    
+    NSNumber *longitudeValue = userInfo[@"longitude"];
+    XCTAssertNil(longitudeValue, @"longitude should be nil");
+}
 - (void)testHistoryURL {
     NSURL *url = [NSURL URLWithString:@"wikipedia://history"];
     NSUserActivity *activity = [NSUserActivity wmf_activityForWikipediaScheme:url];
